@@ -1,0 +1,35 @@
+services:
+  adspro.server:
+    image: ${DOCKER_REGISTRY-}adsproserver
+    build:
+      context: ./adspro.server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    depends_on:
+      - azure-sql-edge
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=azure-sql-edge;Database=AdsproDB;User Id=sa;Password=Strong!Passw0rd;Encrypt=False;
+
+  frontend:
+    build:
+      context: ./adspro.client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - adspro.server
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./adspro.client:/app
+    tty: true
+
+  azure-sql-edge:
+    image: mcr.microsoft.com/azure-sql-edge
+    container_name: azure-sql-edge
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Strong!Passw0rd
+    ports:
+      - "1433:1433"

@@ -1,0 +1,74 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  adspro.server:
+    build:
+      context: "C:\\R\\Adspro\\adspro.server"
+      dockerfile: "Dockerfile"
+      target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
+    command: []
+    entrypoint:
+    - "/opt/rider-debugger/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/rider-debugger/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57100"
+    - "--backend-port=57300"
+    - "--timeout=60"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/rider-debugger"
+      RESHARPER_LOG_CONF: "/etc/opt/rider-debugger/backend-log.xml"
+    image: "adsproserver:dev"
+    ports:
+    - "127.0.0.1:57000:57100"
+    - "127.0.0.1:57200:57300"
+    volumes:
+    - "C:\\Users\\BlackSteel\\.nuget\\packages:/home/app/.nuget/packages"
+    - "C:\\R\\Adspro\\adspro.server:/app:rw"
+    - "C:\\R\\Adspro:/src:rw"
+    - "C:\\Users\\BlackSteel\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2024.2.3\\\
+      Linux64:/opt/rider-debugger"
+    - "C:\\Users\\BlackSteel\\AppData\\Local\\JetBrains\\Installations\\Rider242\\\
+      bin:/etc/opt/rider-debugger/backend-log.xml"
+    - "C:\\Users\\BlackSteel\\AppData\\Local\\JetBrains\\Rider2024.2\\log\\DebuggerWorker\\\
+      JetBrains.Debugger.Worker.2024_9_30_23_15_30:/var/opt/rider-debugger:rw"
+    working_dir: "/app"
+  frontend:
+    build:
+      context: "C:\\R\\Adspro\\adspro.client"
+      dockerfile: "Dockerfile"
+      args:
+        BUILD_CONFIGURATION: "Debug"
+    command: []
+    entrypoint:
+    - "/opt/rider-debugger/linux-musl-x64/dotnet/dotnet"
+    - "exec"
+    - "--runtimeconfig"
+    - "/opt/rider-debugger/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "/opt/rider-debugger/JetBrains.Debugger.Worker.exe"
+    - "--mode=server"
+    - "--frontend-port=57100"
+    - "--backend-port=57300"
+    - "--timeout=60"
+    environment:
+      DOTNET_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/rider-debugger"
+      RESHARPER_LOG_CONF: "/etc/opt/rider-debugger/backend-log.xml"
+    image: "adspro.client:dev"
+    ports:
+    - "127.0.0.1:57001:57100"
+    - "127.0.0.1:57201:57300"
+    volumes:
+    - "C:\\Users\\BlackSteel\\.nuget\\packages:/root/.nuget/packages"
+    - "C:\\R\\Adspro\\adspro.client:/app-1:rw"
+    - "C:\\R\\Adspro:/src:rw"
+    - "C:\\Users\\BlackSteel\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2024.2.3\\\
+      LinuxMusl64:/opt/rider-debugger"
+    - "C:\\Users\\BlackSteel\\AppData\\Local\\JetBrains\\Installations\\Rider242\\\
+      bin:/etc/opt/rider-debugger/backend-log.xml"
+    - "C:\\Users\\BlackSteel\\AppData\\Local\\JetBrains\\Rider2024.2\\log\\DebuggerWorker\\\
+      JetBrains.Debugger.Worker.2024_9_30_23_15_30:/var/opt/rider-debugger:rw"
+    working_dir: "/app-1"

@@ -1,0 +1,81 @@
+name: dockercompose14673809187092868993
+services:
+  adspro.server:
+    build:
+      context: C:\R\Adspro\adspro.server
+      dockerfile: Dockerfile
+    depends_on:
+      azure-sql-edge:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__DefaultConnection: Server=azure-sql-edge;Database=YourDatabase;User Id=sa;Password=YourStrong!Passw0rd;
+    image: adsproserver
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "5000"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\BlackSteel\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\BlackSteel\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  azure-sql-edge:
+    container_name: azure-sql-edge
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: YourStrong!Passw0rd
+    image: mcr.microsoft.com/azure-sql-edge
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1433"
+        protocol: tcp
+  frontend:
+    build:
+      context: C:\R\Adspro\adspro.client
+      dockerfile: Dockerfile
+    depends_on:
+      adspro.server:
+        condition: service_started
+        required: true
+    environment:
+      NODE_ENV: development
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5173
+        published: "3000"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\R\Adspro\adspro.client
+        target: /app
+        bind:
+          create_host_path: true
+networks:
+  default:
+    name: dockercompose14673809187092868993_default
